@@ -42,7 +42,6 @@ mod tests {
             assert_eq!(*val, buf2.left[idx * 3 + 2]);
         }
 
-
         for (idx, val) in buf.right.iter().enumerate() {
             assert_eq!(*val, buf2.right[idx * 3]);
             assert_eq!(*val, buf2.right[idx * 3 + 1]);
@@ -50,4 +49,3 @@ mod tests {
         }
     }
 }
-
