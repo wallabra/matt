@@ -13,25 +13,22 @@
  * This is a sparse matrix, so the vast majority of values won't actually be
  * stored.
  */
+
+type Subrow = (usize, Vec<f32>);
+
+#[derive(Default)]
 pub struct RoutingMatrix {
-    subrows: Vec<(usize, Vec<f32>)>,
+    subrows: Vec<Subrow>,
     subrow_idx: Vec<Vec<usize>>,
 }
 
 impl RoutingMatrix {
-    pub fn new() -> Self {
-        RoutingMatrix {
-            subrows: vec![],
-            subrow_idx: vec![],
-        }
-    }
-
-    fn add_subrow<'a>(
-        &'a mut self,
+    fn add_subrow(
+        &mut self,
         row: usize,
         col_offset: usize,
         values: Vec<f32>,
-    ) -> &'a mut (usize, Vec<f32>) {
+    ) -> &mut Subrow {
         self.subrows.push((col_offset, values));
         let sridx = self.subrows.len() - 1;
         self.subrow_idx.resize(row + 1, vec![]);
@@ -42,7 +39,7 @@ impl RoutingMatrix {
     fn get_subrows<'a>(
         &'a self,
         row: usize,
-    ) -> Option<Box<dyn Iterator<Item = &(usize, Vec<f32>)> + 'a>> {
+    ) -> Option<Box<dyn Iterator<Item = &Subrow> + 'a>> {
         if row < self.subrow_idx.len() || self.subrow_idx[row].is_empty() {
             None
         } else {
@@ -60,14 +57,8 @@ impl RoutingMatrix {
         }
     }
 
-    fn find_subrow(&self, row: usize, col: usize) -> Option<&(usize, Vec<f32>)> {
-        let subrow_iter = self.get_subrows(row);
-
-        if subrow_iter.is_none() {
-            return None;
-        }
-
-        let subrow_iter = subrow_iter.unwrap();
+    fn _find_subrow(&self, row: usize, col: usize) -> Option<&Subrow> {
+        let subrow_iter = self.get_subrows(row)?;
 
         for subrow in subrow_iter {
             if subrow.0 < col {
@@ -89,10 +80,7 @@ impl RoutingMatrix {
     fn find_subrow_mut(&mut self, row: usize, col: usize) -> Option<usize> {
         let subrow_iter = self.get_subrow_indices(row);
 
-        if subrow_iter.is_none() {
-            None
-        } else {
-            let subrow_iter = subrow_iter.unwrap();
+        if let Some(subrow_iter) = subrow_iter {
             let mut res: Option<usize> = None;
 
             for sridx in subrow_iter {
@@ -113,6 +101,8 @@ impl RoutingMatrix {
             }
 
             res
+        } else {
+            None
         }
     }
 
@@ -132,9 +122,7 @@ impl RoutingMatrix {
     pub fn sources_for(&self, sink: usize) -> Box<dyn Iterator<Item = (usize, f32)> + '_> {
         if let Some(subrows) = self.get_subrows(sink) {
             Box::new(
-                subrows
-                    .map(|sr| sr.1.iter().enumerate().map(|(idx, val)| (idx + sr.0, *val)))
-                    .flatten(),
+                subrows.flat_map(|sr| sr.1.iter().enumerate().map(|(idx, val)| (idx + sr.0, *val))),
             )
         } else {
             Box::new(std::iter::empty())

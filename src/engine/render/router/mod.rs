@@ -13,7 +13,7 @@ impl Router {
     pub fn new(bufsize: usize) -> Self {
         Router {
             bufsize,
-            mat: matrix::RoutingMatrix::new(),
+            mat: matrix::RoutingMatrix::default(),
             sources: vec![],
             sinks: vec![],
         }

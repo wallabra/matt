@@ -8,23 +8,16 @@ pub struct Sampler<Resamp: Resampler> {
 
     resampled: StereoBuffer,
     play_buffer: StereoBuffer,
-    resampler: Resamp,
+    resampler: Resamp
 }
 
 fn tuple_isize(tup: (usize, usize)) -> (isize, isize) {
     (tup.0 as isize, tup.1 as isize)
 }
 
-impl<Resamp> Sampler<Resamp>
-where
-    Resamp: Resampler,
-{
+impl<Resamp> Sampler<Resamp> where Resamp: Resampler {
     fn advance(&mut self, mut interval: usize, sample_data: &SampleData) {
-        let loop_points: (isize, isize) = tuple_isize(
-            sample_data
-                .loop_points
-                .unwrap_or((0, sample_data.length - 1)),
-        );
+        let loop_points: (isize, isize) = tuple_isize(sample_data.loop_points.unwrap_or((0, sample_data.length - 1)));
         let mut next_position = self.position as isize;
 
         while interval > 0 {
@@ -39,7 +32,7 @@ where
                     None => {
                         self.playing = false;
                         return;
-                    }
+                    },
                     Some(looper) => {
                         let offset = loop_points.1 - self.position as isize;
                         interval -= offset as usize;
@@ -56,7 +49,7 @@ where
                         LoopDirection::Normal => {
                             self.playing = false;
                             return;
-                        }
+                        },
                         LoopDirection::PingPong => {
                             interval -= self.position - loop_points.0 as usize;
                             next_position = loop_points.0;
@@ -69,10 +62,8 @@ where
 
     fn check_resample(&mut self, samplerate: usize, sample_data: &SampleData) {
         if samplerate != self.last_rate || self.last_rate == 0 {
-            self.resampled =
-                StereoBuffer::new(sample_data.length * samplerate / sample_data.samplerate);
-            StereoBuffer::from(&sample_data.data)
-                .copy_to_and_resample((&mut self.resampled).into(), &self.resampler);
+            self.resampled = StereoBuffer::new(sample_data.length * samplerate / sample_data.samplerate);
+            StereoBuffer::from(&sample_data.data).copy_to_and_resample((&mut self.resampled).into(), &self.resampler);
         }
     }
 
@@ -93,16 +84,13 @@ where
     }
 }
 
-impl<Resamp> SourceObj for Sampler<Resamp>
-where
-    Resamp: Resampler,
-{
+impl<Resamp> SourceObj for Sampler<Resamp> where Resamp: Resampler {
     fn gush_audio(&self, to: &mut StereoBuffer) {
-        self.play_buffer
-            .copy_to_and_resample(to.into(), &NoResample);
+        self.play_buffer.copy_to_and_resample(to.into(), &NoResample);
     }
 }
 
 pub mod prelude {
     pub use super::Sampler;
 }
+

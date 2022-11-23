@@ -7,7 +7,7 @@ pub enum LoopDirection {
 
 pub struct LoopInfo {
     pub dir: LoopDirection,
-    pub sustain: bool
+    pub sustain: bool,
 }
 
 pub enum SampleDataBuffer {
@@ -23,7 +23,7 @@ impl From<&SampleDataBuffer> for StereoBuffer {
                 res.left.copy_from_slice(buf);
                 res.right.copy_from_slice(buf);
                 res
-            },
+            }
 
             SampleDataBuffer::Stereo(left, right) => {
                 let mut res = StereoBuffer::new(left.len());
@@ -44,6 +44,5 @@ pub struct SampleData {
 }
 
 pub mod prelude {
-    pub use super::{SampleData, SampleDataBuffer, LoopInfo, LoopDirection};
+    pub use super::{LoopDirection, LoopInfo, SampleData, SampleDataBuffer};
 }
-
