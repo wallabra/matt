@@ -1,7 +1,6 @@
 pub struct StereoBuffer {
-    length: usize,
-    left: Vec<u32>,
-    right: Vec<u32>,
+    pub left: Vec<u32>,
+    pub right: Vec<u32>,
 }
 
 pub trait Resampler {
@@ -11,7 +10,6 @@ pub trait Resampler {
 impl StereoBuffer {
     pub fn new(length: usize) -> StereoBuffer {
         StereoBuffer {
-            length,
             left: vec![0; length],
             right: vec![0; length],
         }
@@ -76,13 +74,14 @@ impl StereoBuffer {
     }
 
     pub fn copy_to_and_resample(
-        self,
+        &self,
         to: (&mut [u32], &mut [u32]),
         resampler: Box<impl Resampler>,
     ) {
         debug_assert!(to.0.len() == to.1.len());
+        debug_assert!(self.left.len() == self.right.len());
 
-        if self.length == to.0.len() {
+        if self.left.len() == to.0.len() {
             to.0.iter_mut()
                 .zip(self.left.iter())
                 .for_each(|(os, is)| *os = *is);
@@ -93,6 +92,18 @@ impl StereoBuffer {
             resampler.resample(&self.left, to.0);
             resampler.resample(&self.right, to.1);
         }
+    }
+}
+
+impl<'a> From<&'a StereoBuffer> for (&'a [u32], &'a [u32]) {
+    fn from(val: &'a StereoBuffer) -> (&'a [u32], &'a [u32]) {
+        (&val.left, &val.right)
+    }
+}
+
+impl<'a> From<&'a mut StereoBuffer> for (&'a mut [u32], &'a mut [u32]) {
+    fn from(val: &'a mut StereoBuffer) -> (&'a mut [u32], &'a mut [u32]) {
+        (&mut val.left, &mut val.right)
     }
 }
 
