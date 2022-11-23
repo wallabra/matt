@@ -17,7 +17,7 @@ impl StereoBuffer {
         }
     }
 
-    pub fn add(&mut self,values: (Vec<u32>, Vec<u32>)) {
+    pub fn add(&mut self, values: (Vec<u32>, Vec<u32>)) {
         for (lo, li) in self.left.iter_mut().zip(values.0.into_iter()) {
             *lo += li;
         }
@@ -75,12 +75,20 @@ impl StereoBuffer {
         )
     }
 
-    pub fn copy_to_and_resample(self, to: (&mut [u32], &mut [u32]), resampler: Box<impl Resampler>) {
+    pub fn copy_to_and_resample(
+        self,
+        to: (&mut [u32], &mut [u32]),
+        resampler: Box<impl Resampler>,
+    ) {
         debug_assert!(to.0.len() == to.1.len());
 
         if self.length == to.0.len() {
-            to.0.iter_mut().zip(self.left.iter()).for_each(|(os, is)| *os = *is);
-            to.1.iter_mut().zip(self.right.iter()).for_each(|(os, is)| *os = *is);
+            to.0.iter_mut()
+                .zip(self.left.iter())
+                .for_each(|(os, is)| *os = *is);
+            to.1.iter_mut()
+                .zip(self.right.iter())
+                .for_each(|(os, is)| *os = *is);
         } else {
             resampler.resample(&self.left, to.0);
             resampler.resample(&self.right, to.1);
@@ -89,5 +97,5 @@ impl StereoBuffer {
 }
 
 pub mod prelude {
-    pub use super::{StereoBuffer, Resampler};
+    pub use super::{Resampler, StereoBuffer};
 }

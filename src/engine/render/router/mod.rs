@@ -33,13 +33,7 @@ impl Router {
         self.mat.set_link(source, sink, value);
     }
 
-    fn get_added(
-        &self,
-        sink_idx: usize,
-    ) -> Option<(
-        Vec<u32>,
-        Vec<u32>
-    )> {
+    fn get_added(&self, sink_idx: usize) -> Option<(Vec<u32>, Vec<u32>)> {
         self.mat
             .sources_for(sink_idx)
             .map(|(src_idx, scale)| self.sources[src_idx].scaled(scale))
