@@ -21,7 +21,7 @@ mod tests {
         let buf = initial_buffer();
         let mut buf2 = StereoBuffer::new(2);
 
-        buf.copy_to_and_resample((&mut buf2).into(), Box::from(NoResample));
+        buf.copy_to_and_resample((&mut buf2).into(), &NoResample);
 
         assert_eq!(buf.left[0], buf2.left[0]);
         assert_eq!(buf.left[1], buf2.left[1]);
@@ -34,7 +34,7 @@ mod tests {
         let buf = initial_buffer();
         let mut buf2 = StereoBuffer::new(6);
 
-        buf.copy_to_and_resample((&mut buf2).into(), Box::from(NoResample));
+        buf.copy_to_and_resample((&mut buf2).into(), &NoResample);
 
         for (idx, val) in buf.left.iter().enumerate() {
             assert_eq!(*val, buf2.left[idx * 3]);
