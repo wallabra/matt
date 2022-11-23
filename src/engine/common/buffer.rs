@@ -73,11 +73,11 @@ impl StereoBuffer {
         )
     }
 
-    pub fn copy_to_and_resample(
+    pub fn copy_to_and_resample<Resamp>(
         &self,
         to: (&mut [u32], &mut [u32]),
-        resampler: Box<impl Resampler>,
-    ) {
+        resampler: &Resamp,
+    ) where Resamp: Resampler {
         debug_assert!(to.0.len() == to.1.len());
         debug_assert!(self.left.len() == self.right.len());
 
