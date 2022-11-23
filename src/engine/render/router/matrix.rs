@@ -52,13 +52,11 @@ impl RoutingMatrix {
         }
     }
 
-    fn get_subrows_mut<'a>(&'a mut self, row: usize) -> Box<dyn Iterator<Item = &'a mut (usize, Vec<f32>)> + 'a> {
+    fn get_subrow_indices(&self, row: usize) -> Option<&[usize]> {
         if row < self.subrow_idx.len() || self.subrow_idx[row].is_empty() {
             None
         } else {
-            let mut refs = vec!();
-
-            Some(Box::new(&self.subrow_idx[row].iter_mut(|idx| (&mut self.subrows[*idx]))))
+            Some(&self.subrow_idx[row])
         }
     }
 
@@ -88,16 +86,18 @@ impl RoutingMatrix {
         None
     }
 
-    fn find_subrow_mut<'a>(&'a mut self, row: usize, col: usize) -> Option<&mut (usize, Vec<f32>)> {
-        let subrow_iter = self.get_subrows_mut(row);
+    fn find_subrow_mut(&mut self, row: usize, col: usize) -> Option<usize> {
+        let subrow_iter = self.get_subrow_indices(row);
 
         if subrow_iter.is_none() {
             None
         } else {
             let subrow_iter = subrow_iter.unwrap();
-            let mut res = None;
+            let mut res: Option<usize> = None;
 
-            for subrow in subrow_iter {
+            for sridx in subrow_iter {
+                let subrow = &self.subrows[*sridx];
+
                 if subrow.0 < col {
                     continue;
                 }
@@ -108,19 +108,20 @@ impl RoutingMatrix {
                     continue;
                 }
 
-                res = Some(subrow);
+                res = Some(*sridx);
+                break;
             }
 
             res
         }
     }
 
-    pub fn add_link(&mut self, source: usize, sink: usize, value: f32) {
+    pub fn set_link(&mut self, source: usize, sink: usize, value: f32) {
         let subrow = self.find_subrow_mut(sink, source);
-        
+
         let subrow = match subrow {
             None => self.add_subrow(sink, source, vec![]),
-            Some(val) => val
+            Some(val) => &mut self.subrows[val],
         };
 
         let idx = sink - subrow.0;

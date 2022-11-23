@@ -4,6 +4,10 @@ pub struct StereoBuffer {
     right: Vec<u32>,
 }
 
+pub trait Resampler {
+    fn resample(&self, from: &[u32], to: &mut [u32]);
+}
+
 impl StereoBuffer {
     pub fn new(length: usize) -> StereoBuffer {
         StereoBuffer {
@@ -13,22 +17,22 @@ impl StereoBuffer {
         }
     }
 
-    pub fn add(&mut self, values: (Box<dyn Iterator<Item = u32>>, Box<dyn Iterator<Item = u32>>)) {
-        for (lo, li) in self.left.iter_mut().zip(values.0) {
+    pub fn add(&mut self,values: (Vec<u32>, Vec<u32>)) {
+        for (lo, li) in self.left.iter_mut().zip(values.0.into_iter()) {
             *lo += li;
         }
 
-        for (ro, ri) in self.right.iter_mut().zip(values.1) {
+        for (ro, ri) in self.right.iter_mut().zip(values.1.into_iter()) {
             *ro += ri;
         }
     }
 
-    pub fn set(&mut self, values: (Box<dyn Iterator<Item = u32>>, Box<dyn Iterator<Item = u32>>)) {
-        for (lo, li) in self.left.iter_mut().zip(values.0) {
+    pub fn set(&mut self, values: (Vec<u32>, Vec<u32>)) {
+        for (lo, li) in self.left.iter_mut().zip(values.0.into_iter()) {
             *lo = li;
         }
 
-        for (ro, ri) in self.right.iter_mut().zip(values.1) {
+        for (ro, ri) in self.right.iter_mut().zip(values.1.into_iter()) {
             *ro = ri;
         }
     }
@@ -70,8 +74,20 @@ impl StereoBuffer {
             Box::new(a.1.zip(b.1).map(|(a, b)| a + b)),
         )
     }
+
+    pub fn copy_to_and_resample(self, to: (&mut [u32], &mut [u32]), resampler: Box<impl Resampler>) {
+        debug_assert!(to.0.len() == to.1.len());
+
+        if self.length == to.0.len() {
+            to.0.iter_mut().zip(self.left.iter()).for_each(|(os, is)| *os = *is);
+            to.1.iter_mut().zip(self.right.iter()).for_each(|(os, is)| *os = *is);
+        } else {
+            resampler.resample(&self.left, to.0);
+            resampler.resample(&self.right, to.1);
+        }
+    }
 }
 
 pub mod prelude {
-    pub use super::StereoBuffer;
+    pub use super::{StereoBuffer, Resampler};
 }
