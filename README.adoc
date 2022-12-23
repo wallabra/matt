@@ -1,0 +1,56 @@
+Matrix Tracker Architecture
+===========================
+:author: Gustavo Rehermann
+:author2: the Codename Corrosion Team
+:email: codenamecorrosion@gmail.com
+:doctype: article
+:description: A minimal, flexible and powerful dynamic music framework.
+:homepage: https://github.com/Codename-Corrosion/matt
+:toc:
+:numbered:
+
+
+The *Matrix Tracker Architecture*, nicknamed *MATT*, is a project which
+seeks to implement an efficient, versatile, and relatively minimalistic
+framework, for music production, playback, and intermediate representation,
+both for ahead-of-time rendering and realtime playback, with an unique support
+for dynamic events.
+
+== Vision
+
+Despite being developed with video games and other such dynamic scenarios in
+mind, MATT also seeks to reformulate the process of music production itself,
+giving the artist more control without overbearing them with tecnical or
+mathematical minutia when it is not necessary to, whilst simultaneously
+faciliating the cultivation of intuition for usage of the tool as well as the
+crafting of sound.
+
+Not only does it focus on an efficient and slick backend, MATT also wants to
+bridge the gap between artistic vision and production, by providing features
+that are easy to reason with, tools that are intuitive in their shaping of
+sound (in particular _granulators_), and a simple but perniciously powerful
+interface to orchestrate these many moving parts into a magnificent
+composition.
+
+
+== Planned Features
+
+To see a list of planned features, please see the project's
+[to-do list](TODO.adoc).
+
+== Project Status
+
+Despite being a part of Codename Corrosion, its status relative to the main
+DAW project's engine is unclear. It exists in a state of half competition,
+half cooperation, testing the viability of ideas that could be integrated
+into the Codename Corrosion DAW, whilst providing its own framework for those.
+
+At the moment, MATT is a big work in progress; some parts of it are not even
+thoroughly planned or sketched yet. Please stay tuned for more updates!
+
+== Licensing Mojo
+
+This project is currently [licensed](LICENSE) under the _MIT License_. There
+are plans to harden it with copyleft, such as through the _GNU GPL_, or another
+copyleft license, in a future where this project shapes up more substantially.
+Again, stay tuned for that!
