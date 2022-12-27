@@ -3,8 +3,8 @@ pub mod ir;
 pub mod common;
 
 pub mod prelude {
-    pub use engine::prelude::*;
-    pub use ir::prelude::*;
-    pub use common::prelude::*;
+    pub use super::engine::prelude::*;
+    pub use super::ir::prelude::*;
+    pub use super::common::prelude::*;
 }
 

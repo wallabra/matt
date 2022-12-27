@@ -1,4 +1,4 @@
-use crate::engine::common::buffer::StereoBuffer;
+use crate::prelude::*;
 
 pub mod router;
 pub mod sampler;
